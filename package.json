@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "connected-react-router": "^6.6.0",
+    "email-validator": "^2.0.4",
     "history": "^4.10.1",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
