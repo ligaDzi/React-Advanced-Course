@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
 
-export class AuthPage extends Component {
+import SignInForm from '../auth/SignInForm'
+
+class AuthPage extends Component {
 
     render() {
         return (
             <div>
                 <h1>AuthPage</h1>
+                <SignInForm />
             </div>
         )
     }
