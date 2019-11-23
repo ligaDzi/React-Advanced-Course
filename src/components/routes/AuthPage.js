@@ -15,7 +15,7 @@ class AuthPage extends Component {
         
         return (
             <div>
-                <h1>AuthPage</h1>
+                <h2>AuthPage</h2>
                 <NavLink to='/auth/signin' activeStyle={{ color: 'red' }}>Sign In</NavLink>
                 <NavLink to='/auth/signup' activeStyle={{ color: 'red' }}>Sign Up</NavLink>
                 <Route path='/auth/signin' render={ () => <SignInForm onSubmit={ this.handleSignIn } /> } />

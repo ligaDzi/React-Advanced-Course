@@ -25,6 +25,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('loading', true);
 
         case SIGN_IN_SUCCESS:
+            console.log('---------------payload.user = ', payload.user)
             return state
                 .set('loading', false)
                 .set('user', payload.user)
@@ -61,3 +62,13 @@ export function signUp(email, password) {
             })
     }
 }
+
+//Здесь проверяется залогинился пользователь или нет
+//Это временный код
+firebase.auth().onAuthStateChanged(user => {
+    const store = require('../redux').default;
+    store.dispatch({
+        type: SIGN_IN_SUCCESS,
+        payload: { user }
+    })
+})
