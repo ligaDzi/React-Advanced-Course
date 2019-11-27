@@ -24,8 +24,8 @@ class Root extends Component {
                 <Switch>
                     <ProtectedRoute path='/admin' component={AdminPage} />
                     <ProtectedRoute path='/people' component={PeoplePage} />
+                    <ProtectedRoute path='/events' component={EventsPage} />
                     <Route path='/auth' component={AuthPage} />
-                    <Route path='/events' component={EventsPage} />
                 </Switch>
             </div>
         )

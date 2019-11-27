@@ -4,6 +4,10 @@ import { reset } from 'redux-form'
 import { generateID } from './utils'
 import { appName } from '../config'
 
+
+/**
+ * Constants
+ */
 const ReducerRecord = Record({
     enitites: new List([])
 });
@@ -22,6 +26,10 @@ export const ADD_PERSON_SUCCESS = `${prefix}/ADD_PERSON_SUCCESS`;
 export const ADD_PERSON_ERROR = `${prefix}/ADD_PERSON_ERROR`;
 export const ADD_PERSON = `${prefix}/ADD_PERSON`;
 
+
+/**
+ * Reducer
+ */
 export default function reducer(state = new ReducerRecord(), action) {
 
     const { type, payload } = action;
@@ -35,14 +43,14 @@ export default function reducer(state = new ReducerRecord(), action) {
     }
 }
 
-// export function addPerson(person) {
-//     return (dispatch) => {
-//         dispatch({
-//             type: ADD_PERSON,
-//             payload: { id: Date.now() + Math.random(), ...person }
-//         })
-//     }
-// }
+/**
+ * Selectors
+ */
+
+
+/**
+ * Action Creators
+ */
 
 export function addPerson(person) {
     return {
@@ -50,6 +58,11 @@ export function addPerson(person) {
         payload: person
     }
 }
+
+
+/**
+ * Sagas
+ */
 
 export const addPersonSaga = function * (action) {
     const id = yield call(generateID);
