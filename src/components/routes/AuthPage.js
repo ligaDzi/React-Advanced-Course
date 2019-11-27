@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Route, NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import { signUp, moduleName } from '../../ducks/auth'
+import { signUp, signIn, moduleName } from '../../ducks/auth'
 
 import SignInForm from '../auth/SignInForm'
 import SignUpForm from '../auth/SignUpForm'
@@ -25,7 +25,7 @@ class AuthPage extends Component {
         )
     }
 
-    handleSignIn = values => console.log('------', values);
+    handleSignIn = ({email, password}) => this.props.signIn(email, password);
     handleSignUp = ({email, password}) => this.props.signUp(email, password);
 }
 
@@ -36,7 +36,8 @@ function mapStateToProps(state) {
 }
 
 const mapToDispatch = {
-    signUp
+    signUp,
+    signIn
 }
 
 const decorator = connect(mapStateToProps, mapToDispatch);

@@ -41,7 +41,7 @@ const validate = ({ firstName, email }) => {
 }
 
 const createReduxForm = reduxForm({ 
-    form: 'people', 
+    form: 'person', 
     validate: validate
 });
 

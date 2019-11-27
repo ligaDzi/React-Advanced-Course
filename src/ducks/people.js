@@ -1,5 +1,6 @@
 import { Record, OrderedMap, List } from 'immutable'
 import { call, put, takeEvery } from 'redux-saga/effects'
+import { reset } from 'redux-form'
 import { generateID } from './utils'
 import { appName } from '../config'
 
@@ -57,6 +58,8 @@ export const addPersonSaga = function * (action) {
         type: ADD_PERSON,
         payload: { ...action.payload, id }
     })
+
+    yield put( reset('person') )
 }
 
 export const saga = function * () {
