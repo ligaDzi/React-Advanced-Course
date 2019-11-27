@@ -1,5 +1,10 @@
 import firebase from 'firebase'
+import Enzyme from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
 
+/**
+ * Конфигурация firebase
+ */
 export const appName = "advreact-494d7"
 export const firebaseConfig = {
     apiKey: "AIzaSyCYkIhvBeDEviS_r_gHo7MfxMlVI9eIACE",
@@ -13,3 +18,8 @@ export const firebaseConfig = {
 }
 
 firebase.initializeApp(firebaseConfig);
+
+/**
+ * кофигурация Enzyme
+ */
+Enzyme.configure({ adapter: new Adapter() })
