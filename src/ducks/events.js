@@ -1,5 +1,5 @@
 import { all, take, call, put } from 'redux-saga/effects'
-import { Record, OrderedMap } from 'immutable'
+import { Record, OrderedMap, OrderedSet } from 'immutable'
 import { appName } from '../config'
 import firebase from 'firebase'
 import { createSelector } from 'reselect'
@@ -14,12 +14,14 @@ export const moduleName = 'events';
 const prefix = `${appName}/${moduleName}`
 export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`
+export const SELECT_EVENT = `${prefix}/SELECT_EVENT`
 
 
 export const ReducerRecord = Record({
     entities: new OrderedMap({}),
     loading: false,
-    loaded: false
+    loaded: false,
+    selected: new OrderedSet([])
 })
 
 export const EventRecord = Record({
@@ -50,6 +52,14 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loaded', true)
                 .set('entities', fbDatatoEntities(payload, EventRecord))
 
+        case SELECT_EVENT:
+            //contains() - определяет есть ли такое значение в спец. массиве OrderedSet
+            //если есть, мы его удаляем
+            //если нет, добавляем
+            return state.selected.contains(payload.uid)
+                ? state.update('selected', selected => selected.remove(payload.uid))
+                : state.update('selected', selected => selected.add(payload.uid))
+
         default: return state;
     }
 }
@@ -77,6 +87,13 @@ export const eventListSelector = createSelector(entitiesSelector, entities => (
 export function fetchAll() {
     return {
         type: FETCH_ALL_REQUEST
+    }
+}
+
+export function selectEvent(uid) {
+    return {
+        type: SELECT_EVENT,
+        payload: { uid }
     }
 }
 
