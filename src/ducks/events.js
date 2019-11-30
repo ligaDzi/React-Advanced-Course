@@ -87,6 +87,13 @@ export const eventListSelector = createSelector(entitiesSelector, entities => (
     entities.valueSeq().toArray()
 ))
 
+export const sectionSelector = createSelector(stateSelector, state => state.selected)
+
+// Возвращаем выбронные events. В selected хроняться их uid, по этим uid мы выбираем event из entities
+export const selectedEventsSelector = createSelector(entitiesSelector, sectionSelector, (entities, selection) => (
+    selection.toArray().map(uid => entities.get(uid))
+))
+
 
 
 

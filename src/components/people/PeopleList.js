@@ -5,6 +5,7 @@ import { List } from 'react-virtualized'
 import { moduleName, fetchAllPeople, peopleListSelector } from '../../ducks/people'
 
 import Loader from '../common/Loader'
+import PersonCard from './PersoCard'
 
 export class PeopleList extends Component {
     static propTypes = {
@@ -21,7 +22,7 @@ export class PeopleList extends Component {
 
         return (
             <List
-                width={200}
+                width={300}
                 height={300}
                 rowCount={people.length}
                 rowHeight={100}
@@ -30,16 +31,11 @@ export class PeopleList extends Component {
         )
     }
 
-    rowRenderer = ({ key, index }) => {
+    rowRenderer = ({ style, key, index }) => {
         const { people } = this.props
         const person = people[index]
 
-        return (
-            <div key={key} > 
-                <h3>{person.firstName}&nbsp;{person.lastName}</h3>
-                <p>{person.email}</p>
-            </div>
-        )
+        return <PersonCard person = {person} style = {style} key = {key} />
     }
 }
 
