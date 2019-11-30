@@ -5,7 +5,7 @@ import { List } from 'react-virtualized'
 import { moduleName, fetchAllPeople, peopleListSelector } from '../../ducks/people'
 
 import Loader from '../common/Loader'
-import PersonCard from './PersoCard'
+import PersonCard from './PersonCard'
 
 export class PeopleList extends Component {
     static propTypes = {
