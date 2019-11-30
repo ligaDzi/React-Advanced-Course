@@ -24,7 +24,7 @@ export class EventList extends Component {
         return (
             <InfiniteLoader
                 isRowLoaded = {this.isRowLoaded}
-                rowCount = {loaded ? events.length : events.length + 1}
+                rowCount = {loaded ? events.length : events.length + 1} //Так сделанно из за firebase (у него нет length)
                 loadMoreRows = {this.loadMoreRows}
             >
                 { ({ onRowsRendered, registerChild }) => 

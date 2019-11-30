@@ -60,7 +60,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('loading', false)
                 .mergeIn(['entities'], fbDatatoEntities(payload, EventRecord))
-                .set('loaded', Object.keys(payload).length < 10)
+                .set('loaded', Object.keys(payload).length < 10)                //Если меньше 10 значит это последние данные из БД
 
         case SELECT_EVENT:
             //contains() - определяет есть ли такое значение в спец. массиве OrderedSet
@@ -82,7 +82,7 @@ export const entitiesSelector = createSelector(stateSelector, state => state.ent
 
 // Т.к. в entities у нас спциальный Map объект ( [id1: {value}, id2: {value}, id2: {value}] )
 // созданный с помощью нашей ф-ции fbDatatoEntities()
-// То преобразование в массив такого объекта вфглядит так: entities.valueSeq().toArray()
+// То преобразование в массив такого объекта выглядит так: entities.valueSeq().toArray()
 export const eventListSelector = createSelector(entitiesSelector, entities => (
     entities.valueSeq().toArray()
 ))

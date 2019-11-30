@@ -5,6 +5,8 @@ import { moduleName, addPerson } from '../../ducks/people'
 
 import Loader from '../common/Loader'
 import NewPersonForm from '../people/NewPersonForm'
+import PeopleList from '../people/PeopleList'
+import PeopleTable from '../people/PeopleTable'
 
 class PeoplePage extends Component {
     static propTypes = {
@@ -12,11 +14,15 @@ class PeoplePage extends Component {
     }
 
     render() {
-        const { addPerson } = this.props;
+        const { addPerson, loading } = this.props;
         return (
             <div>
                 <h2>Add person</h2>
-                <NewPersonForm onSubmit={addPerson}/>              
+                <PeopleTable />
+                { loading
+                    ? <Loader />
+                    : <NewPersonForm onSubmit={addPerson}/>   
+                }
             </div>
         )
     }
@@ -24,6 +30,7 @@ class PeoplePage extends Component {
 
 function mapStateToProps(state) {
     return {
+        loading: state[moduleName].loading
     }
 }
 

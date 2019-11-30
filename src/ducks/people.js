@@ -1,19 +1,22 @@
-import { Record, OrderedMap, List } from 'immutable'
-import { call, put, takeEvery } from 'redux-saga/effects'
+import { Record, OrderedMap } from 'immutable'
+import { call, put, takeEvery, all } from 'redux-saga/effects'
 import { reset } from 'redux-form'
-import { generateID } from './utils'
+import { generateID, fbDatatoEntities } from './utils'
 import { appName } from '../config'
+import { createSelector } from 'reselect'
+import firebase from 'firebase'
 
 
 /**
  * Constants
  */
 const ReducerRecord = Record({
-    enitites: new List([])
+    entities: new OrderedMap({}),
+    loading: false
 });
 
 const PersonRecord = Record({
-    id: null,    
+    uid: null,    
     firstName: null,
     lastName: null,
     email: null
@@ -24,7 +27,9 @@ const prefix = `${appName}/${moduleName}`;
 export const ADD_PERSON_REQUEST = `${prefix}/ADD_PERSON_REQUEST`;
 export const ADD_PERSON_SUCCESS = `${prefix}/ADD_PERSON_SUCCESS`;
 export const ADD_PERSON_ERROR = `${prefix}/ADD_PERSON_ERROR`;
-export const ADD_PERSON = `${prefix}/ADD_PERSON`;
+export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`;
+export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`;
+export const FETCH_ALL_ERROR = `${prefix}/FETCH_ALL_ERROR`;
 
 
 /**
@@ -35,8 +40,20 @@ export default function reducer(state = new ReducerRecord(), action) {
     const { type, payload } = action;
 
     switch(type) {
-        case ADD_PERSON:
-            return state.update( 'enitites', enitites => enitites.push(new PersonRecord(payload.person)) )
+
+        case FETCH_ALL_REQUEST:
+        case ADD_PERSON_REQUEST:
+            return state.set('loading', true)
+
+        case ADD_PERSON_SUCCESS:
+            return state
+                .set('loading', false)
+                .setIn(['entities', payload.uid], new PersonRecord(payload))
+
+        case FETCH_ALL_SUCCESS:
+            return state
+                .set('loading', false)
+                .set('entities', fbDatatoEntities(payload, PersonRecord))
 
         default:
             return state;
@@ -46,6 +63,11 @@ export default function reducer(state = new ReducerRecord(), action) {
 /**
  * Selectors
  */
+export const stateSelector = state => state[moduleName]
+export const entitiesSelector = createSelector(stateSelector, state => state.entities)
+export const idSelector = (_, props) => props.uid
+export const peopleListSelector = createSelector(entitiesSelector, entities => entities.valueSeq().toArray())
+export const personSelector = createSelector(entitiesSelector, idSelector, (entities, id) => entities.get(id))
 
 
 /**
@@ -59,22 +81,62 @@ export function addPerson(person) {
     }
 }
 
+export function fetchAllPeople() {
+    return {
+        type: FETCH_ALL_REQUEST
+    }
+}
+
 
 /**
  * Sagas
  */
 
 export const addPersonSaga = function * (action) {
-    const id = yield call(generateID);
 
-    yield put({
-        type: ADD_PERSON,
-        payload: { ...action.payload, id }
-    })
+    const peopleRef = firebase.database().ref('people')
 
-    yield put( reset('person') )
+    try {
+        const ref = yield call([peopleRef, peopleRef.push], action.payload)
+
+        yield put({
+            type: ADD_PERSON_SUCCESS,
+            payload: { ...action.payload, uid: ref.key }
+        })
+
+        yield put( reset('person') )
+
+    } catch (error) {
+        yield put({
+            type: ADD_PERSON_ERROR,
+            error
+        })
+    }
+}
+
+export const fetchAllSaga = function * (action) {
+
+    try {
+        const ref = firebase.database().ref('people')
+
+        const data = yield ref.once('value')
+
+        yield put({
+            type: FETCH_ALL_SUCCESS,
+            payload: data.val()
+        })
+        
+    } catch (error) {
+        yield put({
+            type: FETCH_ALL_ERROR,
+            error
+        })        
+    }
 }
 
 export const saga = function * () {
-    yield takeEvery(ADD_PERSON_REQUEST, addPersonSaga)
+    yield all([
+        takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
+        takeEvery(FETCH_ALL_REQUEST, fetchAllSaga)
+    ])
 }
