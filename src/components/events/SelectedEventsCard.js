@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
 import { DropTarget } from 'react-dnd'
+import { connect } from 'react-redux'
+import { addEventToPerson, peopleListSelector } from '../../ducks/people'
+
 
 export class SelectedEventsCard extends Component {
     static propTypes = {
@@ -7,7 +10,7 @@ export class SelectedEventsCard extends Component {
     }
 
     render() {
-        const { connectDropTarget, canDrop, hovered } = this.props
+        const { connectDropTarget, canDrop, hovered, people } = this.props
         const { title, when, where } = this.props.event
 
         const dropStyle = {
@@ -15,10 +18,17 @@ export class SelectedEventsCard extends Component {
             backgroundColor: hovered ? 'green' : 'white'
         }
 
+        const peopleElement = people && (
+            <p>
+                {people.map(person => person.email).join(', ')}
+            </p>
+        )
+        
         return connectDropTarget(
             <div style = {dropStyle}>
                 <h3> {title} </h3>
                 <p> {where}, {when} </p>
+                {peopleElement}
             </div>
         )
     }
@@ -33,8 +43,9 @@ const spec = {
         const personUid = monitor.getItem().uid
         const eventUid = props.event.uid
 
-        console.log('------personUid = ', personUid)
-        console.log('------eventUid = ', eventUid)
+        props.addEventToPerson(eventUid, personUid)
+
+        return { eventUid }
     }
 }
 
@@ -46,4 +57,17 @@ const collect = (connect, monitor) => ({
 
 const dropDecorator = DropTarget(types, spec, collect)
 
-export default dropDecorator(SelectedEventsCard)
+
+const mapStateToProps = (state, props) => ({
+    // Вернуть только тех пользователей которые подписанны к данной конференции
+    people: peopleListSelector(state).filter(person => person.events.includes(props.event.uid))
+})
+
+const mapDispatchToProps = {
+    addEventToPerson
+}
+
+const reduxDecor = connect(mapStateToProps, mapDispatchToProps)
+
+
+export default reduxDecor( dropDecorator(SelectedEventsCard) )
