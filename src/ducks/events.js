@@ -94,6 +94,8 @@ export const selectedEventsSelector = createSelector(entitiesSelector, sectionSe
     selection.toArray().map(uid => entities.get(uid))
 ))
 
+export const idSelector = (state, props) => props.uid
+export const eventSelector = createSelector(entitiesSelector, idSelector, (entities, id) => entities.get(id))
 
 
 

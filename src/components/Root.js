@@ -9,6 +9,7 @@ import AuthPage from './routes/AuthPage'
 import PeoplePage from './routes/PeoplePage'
 import EventsPage from './routes/EventsPage'
 import ProtectedRoute from './common/ProtectedRoute'
+import CustomDragLayer from './CustomDragLayer'
 
 class Root extends Component {
 
@@ -21,6 +22,7 @@ class Root extends Component {
         return (
             <div>
                 { btn }
+                <CustomDragLayer />
                 <Switch>
                     <ProtectedRoute path='/admin' component={AdminPage} />
                     <ProtectedRoute path='/people' component={PeoplePage} />
