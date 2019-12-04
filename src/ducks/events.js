@@ -1,4 +1,4 @@
-import { all, take, call, put, select } from 'redux-saga/effects'
+import { all, take, call, put, select, takeEvery } from 'redux-saga/effects'
 import { Record, OrderedMap, OrderedSet } from 'immutable'
 import { appName } from '../config'
 import firebase from 'firebase'
@@ -18,6 +18,8 @@ export const FETCH_LAZY_START = `${prefix}/FETCH_LAZY_START`
 export const FETCH_LAZY_REQUEST = `${prefix}/FETCH_LAZY_REQUEST`
 export const FETCH_LAZY_SUCCESS = `${prefix}/FETCH_LAZY_SUCCESS`
 export const SELECT_EVENT = `${prefix}/SELECT_EVENT`
+export const DELETE_EVENT_REQUEST = `${prefix}/DELETE_EVENT_REQUEST`
+export const DELETE_EVENT_SUCCESS = `${prefix}/DELETE_EVENT_SUCCESS`
 
 
 export const ReducerRecord = Record({
@@ -48,6 +50,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case FETCH_LAZY_START:
         case FETCH_ALL_REQUEST:
+        case DELETE_EVENT_REQUEST:
             return state.set('loading', true)
 
         case FETCH_ALL_SUCCESS:
@@ -69,6 +72,11 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.selected.contains(payload.uid)
                 ? state.update('selected', selected => selected.remove(payload.uid))
                 : state.update('selected', selected => selected.add(payload.uid))
+
+        case DELETE_EVENT_SUCCESS:
+            return state
+                .set('loading', false)
+                .deleteIn(['entities', payload.uid])
 
         default: return state;
     }
@@ -118,6 +126,13 @@ export function fetchLazy() {
 export function selectEvent(uid) {
     return {
         type: SELECT_EVENT,
+        payload: { uid }
+    }
+}
+
+export function deleteEvent(uid) {
+    return {
+        type: DELETE_EVENT_REQUEST,
         payload: { uid }
     }
 }
@@ -173,9 +188,28 @@ export const fetchLazySaga = function * () {
     }
 }
 
+export const deleteEventSaga = function * (action) {
+
+    const { payload } = action
+
+    const eventRef = firebase.database().ref(`events/${payload.uid}`)
+
+    try {
+        yield call([eventRef, eventRef.remove])
+
+        yield put({
+            type: DELETE_EVENT_SUCCESS,
+            payload
+        })
+    } catch (error) {
+        console.error(error)        
+    }
+}
+
 export function * saga() {
     yield all([
         fetchAllSaga(),
-        fetchLazySaga()
+        fetchLazySaga(),
+        takeEvery(DELETE_EVENT_REQUEST, deleteEventSaga)
     ])
 }

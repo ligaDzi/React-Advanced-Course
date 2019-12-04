@@ -1,10 +1,11 @@
 import { Record, OrderedMap } from 'immutable'
 import { call, put, takeEvery, all, select } from 'redux-saga/effects'
 import { reset } from 'redux-form'
-import { generateID, fbDatatoEntities } from './utils'
+import { fbDatatoEntities } from './utils'
 import { appName } from '../config'
 import { createSelector } from 'reselect'
 import firebase from 'firebase'
+
 
 
 /**
@@ -138,7 +139,7 @@ export const fetchAllSaga = function * (action) {
             type: FETCH_ALL_SUCCESS,
             payload: data.val()
         })
-        
+
     } catch (error) {
         yield put({
             type: FETCH_ALL_ERROR,
@@ -167,6 +168,7 @@ export const addEventSaga = function * (action) {
         
     }
 }
+
 
 export const saga = function * () {
     yield all([

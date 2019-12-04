@@ -36,11 +36,13 @@ export class CustomDragLayer extends Component {
             transform: `translate(${x}px, ${y}px)`
         }
 
-        return <div style={style}><PreviewComponent {...item} /></div>
+        return (
+            <div style = {style}> <PreviewComponent {...item} /> </div>
+        )
     }
 
     render() {
-        const { isDragging, offset } = this.props
+        const { isDragging } = this.props
 
         if(!isDragging) return null
 

@@ -13,14 +13,19 @@ export class PersonCard extends Component {
     render() {
         const { person, style, connectDragSource, isDragging } = this.props
 
+        //dropEffect - настройка курсора при перетаскивании
+        const dropEffect = 'copy'
+
         const dragStyle = {
-            backgroundColor: isDragging ? 'grey' : 'white'
+            backgroundColor: isDragging ? 'grey' : 'white',
+            cursor: 'move'
         }
         return connectDragSource(
             <div style = {{ width: 200, height: 100, ...dragStyle, ...style }}>
                 <h3>{person.firstName}&nbsp;{person.lastName}</h3>
                 <p>{person.email}</p>
-            </div>
+            </div>,
+            {dropEffect}
         )
     }
 }
