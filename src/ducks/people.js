@@ -1,5 +1,5 @@
 import { Record, OrderedMap } from 'immutable'
-import { call, put, takeEvery, all, select } from 'redux-saga/effects'
+import { call, put, takeEvery, all, select, delay, fork, spawn, cancel, cancelled, race } from 'redux-saga/effects'
 import { reset } from 'redux-form'
 import { fbDatatoEntities } from './utils'
 import { appName } from '../config'
@@ -169,9 +169,38 @@ export const addEventSaga = function * (action) {
     }
 }
 
+export const bacgroundSyncSaga = function * () {
+
+    try{
+        while (true) {
+            yield call(fetchAllSaga)
+            yield delay(2000)
+        }
+    } finally {
+        if(yield cancelled()) {
+            console.error('Canled bacgroundSyncSaga()')
+        }
+    }
+}
+
+export const cancellableSync = function * () {
+
+    yield race({
+        syncTROLOLO: bacgroundSyncSaga(),
+        delay: delay(6000)
+    })
+
+    // const task = yield fork(bacgroundSyncSaga)
+    // yield delay(6000)
+    // yield cancel(task)
+}
+
 
 export const saga = function * () {
+    yield spawn(cancellableSync)
+
     yield all([
+        // bacgroundSyncSaga(),
         takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
         takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
         takeEvery(ADD_EVENT_REQUEST, addEventSaga)

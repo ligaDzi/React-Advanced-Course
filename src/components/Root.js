@@ -22,6 +22,12 @@ class Root extends Component {
         return (
             <div>
                 { btn }
+                <ul>
+                    <li><Link to='/admin'>admin</Link></li>
+                    <li><Link to='/people'>people</Link></li>
+                    <li><Link to='/events'>events</Link></li>
+                    <li><Link to='/auth'>auth</Link></li>
+                </ul>
                 <CustomDragLayer />
                 <Switch>
                     <ProtectedRoute path='/admin' component={AdminPage} />
