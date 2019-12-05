@@ -2,7 +2,9 @@ import firebase from 'firebase'
 import { Record } from 'immutable'
 import { appName } from '../config'
 import { all, call, put, takeEvery, take, cps } from 'redux-saga/effects'
+import { eventChannel } from 'redux-saga'
 import { push } from 'connected-react-router'
+import { reset } from 'redux-form'
 
 /**
  * Constants
@@ -98,15 +100,11 @@ export const signUpSaga = function * () {
         const action = yield take(SIGN_UP_REQUEST);
         
         try {
-            const user = yield call(
+            yield call(
                 [auth, auth.createUserWithEmailAndPassword],
                 action.payload.email, action.payload.password
             )
-
-            yield put({
-                type: SIGN_IN_SUCCESS,
-                payload: { user }
-            })
+            yield put( reset('auth') )
 
         } catch (error) {
             yield put({
@@ -117,18 +115,28 @@ export const signUpSaga = function * () {
     }
 }
 
+export const createAuthChannel = () => eventChannel(emmit => firebase.auth().onAuthStateChanged(user => emmit({ user })))
+
 export const watchStatusChange = function * () {
-    const auth = firebase.auth();
+    
+    const channel = yield call(createAuthChannel)
 
-    try {
-        yield cps([auth, auth.onAuthStateChanged]);
+    while (true) {
+        const { user } = yield take(channel)
 
-    } catch (user) {
+        if(user) {
+            yield put({
+                type: SIGN_IN_SUCCESS,
+                payload: { user }
+            })
+        } else {
+            yield put({
+                type: SIGN_OUT_SUCCESS,
+                payload: { user }
+            })
 
-        yield put({
-            type: SIGN_IN_SUCCESS,
-            payload: { user }
-        })
+            yield put(push('/auth/signin'))
+        }
     }
 }
 
@@ -136,15 +144,11 @@ export const signInSaga = function * (action) {
     const auth = firebase.auth();
 
     try {
-        const user = yield call(
+        yield call(
             [auth, auth.signInWithEmailAndPassword],
             action.payload.email, action.payload.password
         )
-
-        yield put({
-            type: SIGN_IN_SUCCESS,
-            payload: { user }
-        })
+        yield put( reset('auth') )
 
     } catch (error) {
 
@@ -161,10 +165,7 @@ export const signOutSaga = function * () {
 
     try {
         yield call([auth, auth.signOut]);
-        yield put({
-            type: SIGN_OUT_SUCCESS
-        });
-        yield put(push('/auth/signin'));
+        
     } catch (error) {
         
     }

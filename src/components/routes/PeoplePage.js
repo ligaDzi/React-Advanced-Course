@@ -18,7 +18,7 @@ class PeoplePage extends Component {
         return (
             <div>
                 <h2>Add person</h2>
-                <PeopleList />
+                <PeopleTable />
                 { loading
                     ? <Loader />
                     : <NewPersonForm onSubmit={addPerson}/>   
